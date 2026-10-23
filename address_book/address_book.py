@@ -1,6 +1,7 @@
 from collections import UserDict
 from datetime import date
 
+from .address_book_storage import AddressBookStorage
 from .name import Name
 from .record import Record
 from .upcoming_birthday import UpcomingBirthday
@@ -8,6 +9,16 @@ from .upcoming_birthday import UpcomingBirthday
 
 class AddressBook(UserDict):
     """Collection of records keyed by the case-insensitive contact name."""
+
+    def save(self, filename: str = AddressBookStorage.DEFAULT_FILENAME) -> None:
+        """Write the book to a file."""
+        AddressBookStorage(filename).save(self)
+
+    @classmethod
+    def load(cls, filename: str = AddressBookStorage.DEFAULT_FILENAME) -> "AddressBook":
+        """Return the book stored in a file, or an empty one if it is missing or corrupted."""
+        book = AddressBookStorage(filename).load()
+        return cls() if book is None else book
 
     def add_record(self, record: Record) -> bool:
         """Add a record to the book.
